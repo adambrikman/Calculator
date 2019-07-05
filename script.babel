@@ -1,0 +1,172 @@
+// Get all keys on calculator
+const key = document.querySelectorAll("button");
+
+// Get the display
+const display = document.querySelector("#display");
+
+// Add event listener for each keypress
+key.forEach(function(element) {
+  element.addEventListener("click", function(event) {
+    if(element.textContent == "AC") {
+      display.textContent = 0;
+      formula.textContent = "";
+    }
+
+    // If display is zero (0) and the button clicked is the decimal
+    if(display.textContent == "0" && element.textContent == ".") {
+      // Update the display to read ".0"
+      display.textContent, formula.textContent = "0.";
+
+      // If an operator is clicked
+    } else if (element.textContent == "x" ||
+               element.textContent == "/" ||
+               element.textContent == "-" ||
+               element.textContent == "+") {
+
+      if(formula.textContent.includes("=")) {
+        formula.textContent = formula.textContent.slice(formula.textContent.indexOf("=")+1, formula.textContent.length);
+       
+      }
+
+      // Display the value of the operator
+      display.textContent = element.textContent;
+    } 
+
+    /* If the equal button is pressed and the display is 0 or an operator, display
+    "Not A Number" (NAN) */
+    if(element.textContent == "=" && !formula.textContent.includes("=")) {
+      
+//      console.log(!formula.textContent.includes("="));
+      if(!formula.textContent.includes("=")) {
+        formula.textContent += "="; 
+      }
+      
+      if((display.textContent == "-" || display.textContent == "/" ||
+          display.textContent == "x" || display.textContent == "+")) {
+        display.textContent = "NAN";
+      } else { 
+        display.textContent = parseFloat(eval(formula.textContent.replace(/[=]/, "")).toFixed(10));
+        formula.textContent += parseFloat(eval(formula.textContent.replace(/[=]/, "")).toFixed(10));
+        }
+    }
+
+
+
+
+
+    /*!!!* Operate calculator *!!!*/
+
+    /*() If the length of the values on the 
+    calculator is less than 15 numbers */
+    if(display.textContent.length < 15) {
+
+
+    let buttonPressed = 0;
+
+
+
+      /*** Set the value of the first number on the calculator ***/
+
+      // If the button pressed is a number (and display reads zero)
+      if(element.className == "number" && display.textContent == "0") {
+        // Update the display and formula screens with the value of the number
+        display.textContent = element.textContent;
+        formula.textContent = element.textContent;
+        /*** Update the value of the number on the calculator ***/
+
+        // If the button pressed is a number & not an operator
+      } else if(element.className == "number" && element.className !== "operator") {
+        // If the value of the most recent character on the display is a number
+        if(Number.isInteger(parseInt(display.textContent[display.textContent.length-1]))) {
+          /* Update the display and formula screens 
+          with the value of the next number */
+          if(!formula.textContent.includes("=")) {
+            display.textContent += element.textContent;
+            formula.textContent += element.textContent;             
+          } else {
+            display.textContent = element.textContent;
+            formula.textContent = element.textContent;                         
+          }
+
+          /* Otherwise, the value is an operator (or a
+          decimal point) so update the display & 
+          formula bar with the number */
+        } else {
+          /* Continue to add numbers if there is a 
+          decimal point since this is not an operator*/
+          if(display.textContent.indexOf(".") > -1) {
+
+            /* Add numbers to the display if a
+            character on the display is a decimal point*/
+            display.textContent += element.textContent;
+          } else {
+
+            // Otherwise, begin a string of numbers
+            display.textContent = element.textContent;
+          }
+
+          /* Regardless of the above, update the
+            formula screen*/
+          formula.textContent += element.textContent;            
+
+        }
+
+
+
+
+
+        /*** Prevent multiple decimals being input ***/
+
+        /* If the decimal button is pressed and there does not exist 
+        a decimal already in the display */
+      }  else if(element.id == "decimal" && display.textContent.indexOf(".") == -1) {
+        // Then add the decimal point to the number in the display
+        display.textContent += element.textContent;
+
+        /* For all numbers other than 0 which will 
+        become a decimal after pressing the button */
+        if(display.textContent !== "0.") {
+
+          // Update the formula screen to add the decimal point
+          formula.textContent += element.textContent;
+        }
+
+
+
+
+
+        /*** Update the most recent operator on the formula screen ***/
+
+        // If the button pressed is an operator
+      } else if(element.className == "operator" && element.textContent !== "=") {
+        // Find the last value of string in the formula screen
+        let lastValue = formula.textContent[formula.textContent.length-1];
+
+        // If the last value is a number
+        if(Number.isInteger(parseInt(lastValue))) {
+
+          // Update the formula screen with the clicked operator
+          if(element.textContent == "x") {
+            formula.textContent += "*";
+          } else {
+            formula.textContent += element.textContent;          
+          }
+          // Otherwise, an operator was already selected
+        } else if(element.textContent !== "AC") {
+
+          // Since string are immutable, slice the previous string...
+          let myStr = formula.textContent.slice(0, (formula.textContent.length-1));
+          //...then set the formula to the previous string + the new operator
+
+          if(element.textContent == "x") {
+            formula.textContent = myStr + "*";
+          } else {
+            formula.textContent = myStr + element.textContent;
+          }
+        }
+      }
+
+    }
+
+  })
+})
